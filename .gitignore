@@ -1,7 +1,6 @@
 # Project ignores
-research_notes.md
+Reference_Papers/
+Additional_Files/
 __pycache__/
 .ipynb_checkpoints/
-*.zip
-*.pdf
 .env
