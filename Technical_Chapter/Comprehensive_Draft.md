@@ -93,54 +93,108 @@ Despite remarkable progress across all 26 papers, a distinct and critical infras
 3.  **Lack of Integrated End-to-End Spark ML Flow:** The literature lacks clear, transparent end-to-end architectures that start with HDFS ingestion, utilize Spark's in-memory TF-IDF math, and finish with a massive distributed ensemble. 
 
 This project bridges this exact gap. By discarding massive Transformers for PySpark's computationally optimal MLlib Ensemble Arrays via distributed TF-IDF processing, the system attains production-grade speed without defaulting to inaccurate traditional local ML models.
+## 6. Proposed Methodology & Mathematical Architecture
+
+Our end-to-end methodology is built around three distinct experimental comparisons. Each comparison is designed to rigorously validate a different hypothesis: that distributed architectures outperform monolithic machines, that ensemble models are more accurate than single classifiers, and that Big Data-optimized feature engineering outperforms naive text vectorization. These comparisons feed directly into the Results section, providing empirical evidence for our claims in the literature review.
 
 ---
 
-## 6. Proposed Methodology & Mathematical Architecture
+### **Comparison 1: Architectural — Monolithic (Scikit-Learn) vs. Distributed (PySpark)**
 
-Our architecture proposes a functional end-to-end distributed script utilizing **Apache Spark MLlib**. This methodology heavily relies on distributing dense language mathematics across a generalized cluster.
+This is the **core Big Data comparison** and the most critical for the BDA rubric. The fundamental hypothesis is: a distributed PySpark cluster will process fake news training data significantly faster and more efficiently than a single-node monolithic Python/Scikit-Learn environment, especially as data volume scales.
 
-### 6.1 Data Preprocessing across Worker Nodes
-When PySpark initially loads a multi-gigabyte corpus from HDFS, it creates a highly partitioned DataFrame. 
-1.  **Tokenization:** Each document $D_i$ is mapped across executors. A Spark `RegexTokenizer` converts string vectors into parallel arrays of lowercase substrings (tokens), rejecting non-alphabetic punctuations natively. 
-2.  **Stopwords:** Distributed filters drop useless linguistic artifacts (e.g., "the", "and") utilizing Spark’s `StopWordsRemover`.
+**Experiment Design:**
+- The same dataset (`Fake.csv` + `True.csv`) is fed to two identical pipelines:
+  - **System A (Baseline):** A standard Python scikit-learn pipeline (`TfidfVectorizer` + `RandomForestClassifier`) running on a single CPU core.
+  - **System B (Proposed):** The full PySpark MLlib pipeline running on a distributed cluster with multiple worker nodes.
+- We record **execution time**, **peak memory usage**, and **scalability behavior** (doubling the dataset to test linear vs. sub-linear growth).
 
-### 6.2 Distributed Feature Engineering (TF-IDF & Hashing)
-To convert text arrays into math, PySpark executes Term Frequency-Inverse Document Frequency. Unlike local Sklearn, Spark calculates global IDF values by mapping over executor partitions and utilizing reduce operations at the driver.
+**Key Metrics:**
+| Metric | Monolithic (sklearn) | Distributed (PySpark) |
+|---|---|---|
+| Training Time (s) | `[INSERT SKLEARN TIME]` | `[INSERT PYSPARK TIME]` |
+| Peak RAM Usage (GB) | `[INSERT SKLEARN RAM]` | `[INSERT PYSPARK RAM]` |
+| Scalability (2x data) | `[INSERT SKLEARN 2x TIME]` | `[INSERT PYSPARK 2x TIME]` |
+| Crashes on Large Data? | `[YES/NO]` | `[YES/NO]` |
+
+**Interpretation:** The expected result is Spark completing training in a fraction of the time, demonstrating the signature in-memory distributed memory advantage described by Altheneyan et al. (Paper 2) and Saif et al. (Paper 25).
+
+---
+
+### **Comparison 2: Algorithmic — Which ML Model Wins in PySpark?**
+
+Within the distributed PySpark cluster, we benchmark three classification algorithms side-by-side. Each model is trained on the same partitioned TF-IDF feature vectors so that algorithm choice is the only changing variable.
+
+**Models Evaluated:**
+
+#### A. Logistic Regression (Baseline Classifier)
+Spark's Logistic Regression uses Limited-memory BFGS (L-BFGS) optimization to solve the weights across distributed partitions. It computes the probability that a text vector belongs to class Fake (label = 1):
+$$ p = \sigma(\beta^T x) = \frac{1}{1 + e^{-(\beta^T x)}} $$
+Logistic Regression converges quickly and is ideal for linearly separable features.
+
+#### B. Decision Tree Classifier
+A single distributed Decision Tree is built by recursively splitting TF-IDF feature importance using Information Gain:
+
+**Equation 4: Dataset Entropy**
+$$ Entropy(S) = - p_{true} \log_2(p_{true}) - p_{fake} \log_2(p_{fake}) $$
+
+**Equation 5: Information Gain**
+$$ IG(S, A) = Entropy(S) - \sum_{v \in Values(A)} \frac{|S_v|}{|S|} Entropy(S_v) $$
+
+Decision Trees are fast but prone to overfitting on high-dimensional TF-IDF vectors. This model is included for baseline comparison.
+
+#### C. Random Forest Ensemble (Primary Model)
+To overcome Decision Tree overfitting, we deploy a **distributed Random Forest** of $N$ trees (default: `numTrees=100`). Each tree is built on a random subset of features (bootstrapped columns) in parallel across worker nodes. The final prediction is a majority vote:
+$$ \hat{y} = \text{mode}\left(\{T_1(x), T_2(x), ..., T_N(x)\}\right) $$
+Random Forest produces the highest expected accuracy because the ensemble vote dramatically reduces variance from any single overfitting tree.
+
+**Model Comparison Table:**
+| Model | Accuracy | Precision | Recall | F1-Score | Training Time (s) |
+|---|---|---|---|---|---|
+| Logistic Regression | `[LR_ACC]` | `[LR_PREC]` | `[LR_REC]` | `[LR_F1]` | `[LR_TIME]` |
+| Decision Tree | `[DT_ACC]` | `[DT_PREC]` | `[DT_REC]` | `[DT_F1]` | `[DT_TIME]` |
+| Random Forest | `[RF_ACC]` | `[RF_PREC]` | `[RF_REC]` | `[RF_F1]` | `[RF_TIME]` |
+
+---
+
+### **Comparison 3: Feature Engineering — TF-IDF vs. HashingTF**
+
+Before classification, the text must be vectorized. We compare two Big-Data-friendly strategies to understand which vectorization method is more effective in a distributed Spark environment.
+
+**Method A: Standard TF-IDF Pipeline**
+- Uses Spark's `CountVectorizer` to build a full vocabulary dictionary across the cluster, then applies `IDF` globally.
+- Produces high-quality, semantically meaningful vectors.
+- However, building a full global vocabulary across RDD partitions requires an extra shuffle stage — which is expensive in distributed memory.
 
 **Equation 1: Term Frequency (TF)**
-Evaluates how often term $t$ appears in document $d$:
 $$ TF(t, d) = \frac{f_{t,d}}{\max_{t' \in d} f_{t',d}} $$
-*(Note: PySpark's HashingTF utilizes MurmurHash 3 to map terms to strict bucket indices to avoid costly string lookups across distributed JVMs).*
 
 **Equation 2: Inverse Document Frequency (IDF)**
-A global aggregate calculated across the distributed RDDs to penalize frequent words across the whole corpus $D$:
 $$ IDF(t, D) = \log \left( \frac{|D| + 1}{DF(d, t) + 1} \right) $$
 
 **Equation 3: Final Feature Vector**
 $$ \text{TF-IDF}(t, d, D) = TF(t, d) \times IDF(t, D) $$
 
-These sparse vectors are then mathematically passed via Spark ML pipelines directly into the predictive models.
+**Method B: HashingTF + IDF Pipeline**
+- Skips building the vocabulary dictionary entirely. Instead, it maps each term directly to a bucket index using the **MurmurHash3** function:
+$$ h(t) = \text{MurmurHash3}(t) \mod B $$
+where $B$ is the number of hash buckets (default: $2^{18}$).
+- This eliminates the distributed vocabulary-shuffle bottleneck, making it significantly faster at the cost of potential **hash collisions** (two different words mapping to the same bucket index).
 
-### 6.3 Distributed Spark Machine Learning Algorithms
-We deploy multiple supervised learning algorithms via the `pyspark.ml.classification` library.
+**Feature Engineering Comparison Table:**
+| Feature Method | Vocabulary Build Time | Vector Quality | Hash Collision Risk | Model F1 (RF) |
+|---|---|---|---|---|
+| Standard TF-IDF | `[TFIDF_BUILD_TIME]` | High | None | `[TFIDF_F1]` |
+| HashingTF + IDF | `[HASH_BUILD_TIME]` | Medium-High | Low | `[HASH_F1]` |
 
-#### A. Spark Logistic Regression (Baseline)
-Logistic regression is solved as an optimization sequence via Spark's internal Limited-memory BFGS. It calculates the probability $p$ that a text vector belongs to the "Fake" (1) class:
-$$ p = \sigma(\beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_n x_n) = \frac{1}{1 + e^{-(\beta^T x)}} $$
+---
 
-#### B. Spark Distributed Random Forest
-Because a single Decision Tree easily overfits TF-IDF text features, we deploy a **Random Forest**. In a standalone setup, building 100 trees over 100,000 features is slow. In PySpark, worker nodes simultaneously build separate trees on random feature subsets. 
-At every tree split across the clustered data, the algorithm seeks the highest **Information Gain (IG)**:
-
-**Equation 4: Dataset Entropy**
-$$ Entropy(S) = - p_{true} \log_2(p_{true}) - p_{fake} \log_2(p_{fake}) $$
-
-**Equation 5: Information Gain** 
-Finding optimal splits over feature $A$:
-$$ IG(S, A) = Entropy(S) - \sum_{v \in Values(A)} \frac{|S_v|}{|S|} Entropy(S_v) $$
-
-Spark's driver node receives the unweighted vote from all distributed trees, generating the final aggregate prediction output.
+### 6.4 Data Preprocessing Pipeline (Common to All Models)
+All three comparisons share the same preprocessing pipeline applied in sequence across distributed Spark executor nodes:
+1.  **Tokenization:** Spark `RegexTokenizer` converts raw text strings into lowercase word arrays, stripping punctuation.
+2.  **Stopword Removal:** Spark `StopWordsRemover` eliminates linguistically uninformative tokens (e.g., "the", "is", "a").
+3.  **Vectorization:** Either TF-IDF or HashingTF as described above.
+4.  **Label Assignment:** `Fake.csv` rows are labeled `1`; `True.csv` rows are labeled `0`.ion output.
 
 ---
 
@@ -160,27 +214,50 @@ The codebase implementation (via Jupyter Notebook PySpark pipelines) rigorously 
 
 ## 8. Experimental Case Study & Results
 
-*Note: This section strictly contains placeholders to be replaced directly by analytical output generated by `main.ipynb` once the Python script executes over the cluster environment.*
+*Note: All tables have been pre-formatted per the methodology. Replace all `[PLACEHOLDER]` values with outputs generated by `main.ipynb` after execution.*
 
-### 8.1 Dataset Composition
-*   **Total Labeled Records:** `[INSERT DATASET SIZE]`
-*   **Fake News Entries (Target = 1):** `[INSERT FALSE COUNT]`
-*   **True News Entries (Target = 0):** `[INSERT TRUE COUNT]`
+### 8.1 Dataset Composition (Clement Bisaillon — Kaggle)
+| Property | Value |
+|---|---|
+| Total Labeled Records | `[INSERT TOTAL SIZE]` |
+| Fake News Entries (Label = 1) | `[INSERT FAKE COUNT]` |
+| True News Entries (Label = 0) | `[INSERT TRUE COUNT]` |
+| Total Features (Post-TF-IDF) | `[INSERT FEATURE DIM]` |
+| Train / Test Split | 80% / 20% |
 
-### 8.2 Execution Performance Metrics
-*   **Standalone SkLearn Baseline Runtime:** `[INSERT BATCH TIME SECONDS]`
-*   **PySpark Distributed Runtime:** `[INSERT SPARK TIME SECONDS]` (Proving large-scale execution velocity).
+### 8.2 Comparison 1 Results: Architectural Performance
+*(Replace with output from the timed cells in main.ipynb)*
+| Metric | Monolithic Sklearn | Distributed PySpark | Improvement |
+|---|---|---|---|
+| Training Time (s) | `[SKLEARN_TIME]` | `[PYSPARK_TIME]` | `[X]x faster` |
+| Peak RAM Usage (GB) | `[SKLEARN_RAM]` | `[PYSPARK_RAM]` | — |
+| Scalability (2x Data) | `[SKLEARN_2X]s` | `[PYSPARK_2X]s` | — |
 
-### 8.3 Statistical Efficacy Output
-A PySpark `MulticlassClassificationEvaluator` is utilized to output the following test metrics:
-*   **Logistic Regression Accuracy:** `[LR ACCURACY]` | **F1-Score:** `[LR F1]`
-*   **Decision Tree Accuracy:** `[DT ACCURACY]` | **F1-Score:** `[DT F1]`
-*   **Random Forest Ensemble Accuracy:** `[RF ACCURACY]` | **F1-Score:** `[RF F1]`
+### 8.3 Comparison 2 Results: Algorithmic Model Benchmarks
+*(Replace with output from PySpark MulticlassClassificationEvaluator)*
+| Model | Accuracy | Precision | Recall | F1-Score | Time (s) |
+|---|---|---|---|---|---|
+| Logistic Regression | `[LR_ACC]` | `[LR_PREC]` | `[LR_REC]` | `[LR_F1]` | `[LR_TIME]` |
+| Decision Tree | `[DT_ACC]` | `[DT_PREC]` | `[DT_REC]` | `[DT_F1]` | `[DT_TIME]` |
+| **Random Forest** | **`[RF_ACC]`** | **`[RF_PREC]`** | **`[RF_REC]`** | **`[RF_F1]`** | `[RF_TIME]` |
 
-### 8.4 Visual Results
-*(Outputs generated from Matplotlib / PySpark DataFrame `.toPandas()` aggregations)*
-*   **[INSERT CONFUSION MATRIX HEATMAP HERE]**
-*   **[INSERT ROC / AUC CURVE GRAPH HERE]**
+### 8.4 Comparison 3 Results: Feature Engineering
+| Feature Method | Build Time (s) | RF F1-Score | Notes |
+|---|---|---|---|
+| Standard TF-IDF | `[TFIDF_TIME]` | `[TFIDF_F1]` | Full vocab dictionary |
+| HashingTF + IDF | `[HASH_TIME]` | `[HASH_F1]` | No vocab, faster shuffle |
+
+### 8.5 Visual Results
+*(All graphs generated by `main.ipynb` using Matplotlib and inserted directly below.)*
+
+**Figure 1: Confusion Matrix — Random Forest (Best Model)**
+`[INSERT CONFUSION MATRIX HEATMAP HERE]`
+
+**Figure 2: ROC-AUC Curves — All Three Models Overlaid**
+`[INSERT ROC / AUC CURVE GRAPH HERE]`
+
+**Figure 3: Training Time Bar Chart — sklearn vs. PySpark**
+`[INSERT ARCHITECTUAL PERFORMANCE BAR CHART HERE]`
 
 ---
 
