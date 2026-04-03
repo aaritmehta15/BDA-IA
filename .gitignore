@@ -1,6 +1,4 @@
 # Project ignores
-Reference_Papers/
-Additional_Files/
 __pycache__/
 .ipynb_checkpoints/
 .env
