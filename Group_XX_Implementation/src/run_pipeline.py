@@ -305,3 +305,132 @@ def feature_engineering(spark, df):
         return feats_dict, "pandas", feat_dim
 
 
+# ─── 6. Model Training & Evaluation ───────────────────────────────────────────
+
+def _fmt(v):
+    return f"{v:.4f}"
+
+
+# ── Spark path ─────────────────────────────────────────────────────────────────
+def train_and_evaluate_spark(features_dict):
+    from pyspark.ml.classification import (
+        LogisticRegression as SparkLR,
+        DecisionTreeClassifier as SparkDT,
+        RandomForestClassifier as SparkRF,
+    )
+    from pyspark.ml.evaluation import MulticlassClassificationEvaluator
+
+    results        = []
+    spark_total_t0 = time.time()
+
+    for feat_name, (df_feat, feat_col, build_time) in features_dict.items():
+        train_df, test_df = df_feat.randomSplit([0.8, 0.2], seed=42)
+        train_df.cache()
+        test_df.cache()
+
+        # FIXED: direct instantiation per feat_col — no extractParamMap()
+        # FIXED: numTrees 50 → 100 to match draft spec
+        model_defs = [
+            ("LR", SparkLR(featuresCol=feat_col, labelCol="label", maxIter=20)),
+            ("DT", SparkDT(featuresCol=feat_col, labelCol="label", maxDepth=10)),
+            ("RF", SparkRF(featuresCol=feat_col, labelCol="label",
+                           numTrees=100, maxDepth=10)),
+        ]
+
+        for model_name, model in model_defs:
+            t0         = time.time()
+            fitted     = model.fit(train_df)
+            train_time = time.time() - t0
+            preds      = fitted.transform(test_df)
+
+            def _eval(metric, _preds=preds):
+                return MulticlassClassificationEvaluator(
+                    labelCol="label", predictionCol="prediction",
+                    metricName=metric
+                ).evaluate(_preds)
+
+            results.append({
+                "Model":     model_name,
+                "Feature":   feat_name.upper(),
+                "BuildTime": build_time,
+                "Accuracy":  _eval("accuracy"),
+                "Precision": _eval("weightedPrecision"),
+                "Recall":    _eval("weightedRecall"),
+                "F1":        _eval("f1"),
+                "TrainTime": train_time,
+            })
+            print(f"  [done] {model_name} + {feat_name.upper()} "
+                  f"(train={train_time:.1f}s)")
+
+        train_df.unpersist()
+        test_df.unpersist()
+
+    spark_total = time.time() - spark_total_t0
+    print(f"\n[Comparison 1] Spark total training time: {spark_total:.2f}s")
+    return results
+
+
+# ── Pandas / sklearn path ──────────────────────────────────────────────────────
+def train_and_evaluate_pandas(features_dict):
+    from sklearn.linear_model    import LogisticRegression as SkLR
+    from sklearn.tree            import DecisionTreeClassifier as SkDT
+    from sklearn.ensemble        import RandomForestClassifier as SkRF
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics         import (accuracy_score, precision_score,
+                                         recall_score, f1_score)
+
+    # FIXED: n_estimators 50 → 100 to match draft spec
+    model_defs = [
+        ("LR", SkLR(max_iter=1000, solver="saga", n_jobs=-1)),
+        ("DT", SkDT(max_depth=10, random_state=42)),
+        ("RF", SkRF(n_estimators=100, max_depth=10, random_state=42, n_jobs=-1)),
+    ]
+
+    results          = []
+    sklearn_total_t0 = time.time()
+
+    for feat_name, (X, y, build_time) in features_dict.items():
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42, stratify=y
+        )
+
+        for model_name, model in model_defs:
+            t0         = time.time()
+            model.fit(X_train, y_train)
+            train_time = time.time() - t0
+            y_pred     = model.predict(X_test)
+
+            results.append({
+                "Model":     model_name,
+                "Feature":   feat_name.upper(),
+                "BuildTime": build_time,
+                "Accuracy":  accuracy_score(y_test, y_pred),
+                "Precision": precision_score(y_test, y_pred,
+                                             average="weighted", zero_division=0),
+                "Recall":    recall_score(y_test, y_pred,
+                                          average="weighted", zero_division=0),
+                "F1":        f1_score(y_test, y_pred,
+                                      average="weighted", zero_division=0),
+                "TrainTime": train_time,
+            })
+            print(f"  [done] {model_name} + {feat_name.upper()} "
+                  f"(train={train_time:.1f}s)")
+
+    sklearn_total = time.time() - sklearn_total_t0
+    print(f"\n[Comparison 1] Sklearn total training time: {sklearn_total:.2f}s")
+    return results
+
+
+
+
+
+
+def train_and_evaluate(spark, features_dict, mode):
+    print("\n── Training models ─────────────────────────────────────────────────")
+    if mode == "spark":
+        results = train_and_evaluate_spark(features_dict)
+    else:
+        results = train_and_evaluate_pandas(features_dict)
+    return results
+
+
