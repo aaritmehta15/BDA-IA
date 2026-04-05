@@ -470,3 +470,169 @@ def print_results_table(results):
             seen.add(key)
 
 
+# ─── 8. Visualisations (Section 8.5) ──────────────────────────────────────────
+
+def generate_visualizations(results, features_dict, mode):
+    """Produce and save the three figures required by draft Section 8.5."""
+    try:
+        import matplotlib
+        matplotlib.use("Agg")          # non-interactive backend — safe everywhere
+        import matplotlib.pyplot as plt
+        import numpy as np
+    except ImportError:
+        print("[WARN] matplotlib not installed — skipping visualisations")
+        return
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+    # ── Figure 1: Confusion Matrix heatmap (best F1 model, pandas only) ────────
+    if mode == "pandas":
+        try:
+            from sklearn.metrics         import confusion_matrix
+            from sklearn.model_selection import train_test_split
+
+            # Identify best result by F1 and re-train to get predictions
+            best = max(results, key=lambda x: x["F1"])
+            feat_key = best["Feature"].lower()   # 'tfidf' or 'hash'
+            X, y, _  = features_dict[feat_key]
+
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=42, stratify=y
+            )
+
+            # Rebuild the best model quickly
+            if best["Model"] == "LR":
+                from sklearn.linear_model import LogisticRegression
+                clf = LogisticRegression(max_iter=1000, solver="saga", n_jobs=-1)
+            elif best["Model"] == "DT":
+                from sklearn.tree import DecisionTreeClassifier
+                clf = DecisionTreeClassifier(max_depth=10, random_state=42)
+            else:
+                from sklearn.ensemble import RandomForestClassifier
+                clf = RandomForestClassifier(n_estimators=100, max_depth=10,
+                                             random_state=42, n_jobs=-1)
+            clf.fit(X_train, y_train)
+            y_pred = clf.predict(X_test)
+
+            cm   = confusion_matrix(y_test, y_pred)
+            fig, ax = plt.subplots(figsize=(6, 5))
+            im = ax.imshow(cm, interpolation="nearest", cmap="Blues")
+            plt.colorbar(im, ax=ax)
+            ax.set_xticks([0, 1]); ax.set_yticks([0, 1])
+            ax.set_xticklabels(["True (0)", "Fake (1)"])
+            ax.set_yticklabels(["True (0)", "Fake (1)"])
+            for i in range(2):
+                for j in range(2):
+                    ax.text(j, i, str(cm[i, j]), ha="center", va="center",
+                            color="white" if cm[i, j] > cm.max() / 2 else "black",
+                            fontsize=14, fontweight="bold")
+            ax.set_xlabel("Predicted Label", fontsize=12)
+            ax.set_ylabel("True Label", fontsize=12)
+            ax.set_title(f"Figure 1 — Confusion Matrix\n"
+                         f"({best['Model']} + {best['Feature']}, best F1)",
+                         fontsize=13)
+            plt.tight_layout()
+            out1 = os.path.join(OUTPUT_DIR, "figure1_confusion_matrix.png")
+            fig.savefig(out1, dpi=150)
+            plt.close(fig)
+            print(f"[OK]  Figure 1 saved → {out1}")
+        except Exception as e:
+            print(f"[WARN] Figure 1 skipped: {e}")
+
+    # ── Figure 2: ROC-AUC curves for all 3 models (TF-IDF, pandas only) ────────
+    if mode == "pandas":
+        try:
+            from sklearn.metrics         import roc_curve, auc
+            from sklearn.model_selection import train_test_split
+            from sklearn.linear_model    import LogisticRegression
+            from sklearn.tree            import DecisionTreeClassifier
+            from sklearn.ensemble        import RandomForestClassifier
+
+            X, y, _ = features_dict["tfidf"]
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=42, stratify=y
+            )
+
+            model_defs = [
+                ("LR",  LogisticRegression(max_iter=1000, solver="saga", n_jobs=-1)),
+                ("DT",  DecisionTreeClassifier(max_depth=10, random_state=42)),
+                ("RF",  RandomForestClassifier(n_estimators=100, max_depth=10,
+                                               random_state=42, n_jobs=-1)),
+            ]
+            colors = ["#4C72B0", "#DD8452", "#55A868"]
+
+            fig, ax = plt.subplots(figsize=(7, 6))
+            for (mname, clf), color in zip(model_defs, colors):
+                clf.fit(X_train, y_train)
+                if hasattr(clf, "predict_proba"):
+                    scores = clf.predict_proba(X_test)[:, 1]
+                else:
+                    scores = clf.decision_function(X_test)
+                fpr, tpr, _ = roc_curve(y_test, scores)
+                roc_auc     = auc(fpr, tpr)
+                ax.plot(fpr, tpr, color=color, lw=2,
+                        label=f"{mname}  (AUC = {roc_auc:.4f})")
+
+            ax.plot([0, 1], [0, 1], "k--", lw=1)
+            ax.set_xlim([0.0, 1.0]); ax.set_ylim([0.0, 1.02])
+            ax.set_xlabel("False Positive Rate", fontsize=12)
+            ax.set_ylabel("True Positive Rate", fontsize=12)
+            ax.set_title("Figure 2 — ROC-AUC Curves (TF-IDF features)", fontsize=13)
+            ax.legend(loc="lower right", fontsize=11)
+            plt.tight_layout()
+            out2 = os.path.join(OUTPUT_DIR, "figure2_roc_auc.png")
+            fig.savefig(out2, dpi=150)
+            plt.close(fig)
+            print(f"[OK]  Figure 2 saved → {out2}")
+        except Exception as e:
+            print(f"[WARN] Figure 2 skipped: {e}")
+
+    # ── Figure 3: Training Time bar chart (LR / DT / RF, TF-IDF) ──────────────
+    try:
+        tfidf_results = [r for r in results if r["Feature"] == "TFIDF"]
+        if not tfidf_results:
+            tfidf_results = results          # fallback
+        model_names = [r["Model"]     for r in tfidf_results]
+        train_times = [r["TrainTime"] for r in tfidf_results]
+        colors3     = ["#4C72B0", "#DD8452", "#55A868",
+                       "#C44E52", "#8172B3", "#937860"]
+
+        fig, ax = plt.subplots(figsize=(7, 5))
+        bars = ax.bar(model_names, train_times,
+                      color=colors3[:len(model_names)], width=0.5, edgecolor="white")
+        for bar, val in zip(bars, train_times):
+            ax.text(bar.get_x() + bar.get_width() / 2,
+                    bar.get_height() + max(train_times) * 0.01,
+                    f"{val:.2f}s", ha="center", va="bottom", fontsize=11)
+        ax.set_xlabel("Model", fontsize=12)
+        ax.set_ylabel("Training Time (s)", fontsize=12)
+        ax.set_title("Figure 3 — Model Training Time (TF-IDF features)", fontsize=13)
+        ax.set_ylim(0, max(train_times) * 1.2 if train_times else 1)
+        plt.tight_layout()
+        out3 = os.path.join(OUTPUT_DIR, "figure3_training_time.png")
+        fig.savefig(out3, dpi=150)
+        plt.close(fig)
+        print(f"[OK]  Figure 3 saved → {out3}")
+    except Exception as e:
+        print(f"[WARN] Figure 3 skipped: {e}")
+
+
+# ─── Main ──────────────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    spark        = init_spark()
+    df           = load_data(spark)
+    show_info(df)
+    # Preprocess first — feature_engineering needs filtered_tokens
+    df, text_col = preprocess(spark, df)
+    show_preprocessed(df, text_col)
+    # Feature engineering — returns feat_dim so we can report it
+    features_dict, mode, feat_dim = feature_engineering(spark, df)
+    show_dataset_stats(df, feat_dim=feat_dim)
+    results      = train_and_evaluate(spark, features_dict, mode)
+    print_results_table(results)
+    print("\n── Generating visualisations (Section 8.5) ─────────────────")
+    generate_visualizations(results, features_dict, mode)
+    print("\nNEXT: Visualization ready")
+
+
