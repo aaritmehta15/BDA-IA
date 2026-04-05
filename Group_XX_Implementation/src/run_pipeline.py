@@ -105,3 +105,39 @@ def load_data(spark=None):
     return df
 
 
+# ─── 3. Display helpers ─────────────────────────────────────────
+def show_info(df):
+    if USE_SPARK:
+        print("\n── Schema ──────────────────────────────────────")
+        df.printSchema()
+        print("\n── First 5 rows ────────────────────────────────")
+        df.show(5, truncate=80)
+        print(f"\n── Total rows: {df.count():,} ─────────────────────────")
+    else:
+        print("\n── Columns / dtypes ────────────────────────────")
+        print(df.dtypes)
+        print("\n── First 5 rows ────────────────────────────────")
+        print(df.head(5).to_string(index=False))
+        print(f"\n── Total rows: {len(df):,} ─────────────────────────")
+
+
+def show_dataset_stats(df, feat_dim=None):
+    """Print dataset composition stats required by draft Section 8.1."""
+    print("\n── Dataset Composition (Section 8.1) ────────────────")
+    if USE_SPARK:
+        total     = df.count()
+        fake_cnt  = df.filter(df.label == 1).count()
+        true_cnt  = df.filter(df.label == 0).count()
+    else:
+        total     = len(df)
+        fake_cnt  = int((df["label"] == 1).sum())
+        true_cnt  = int((df["label"] == 0).sum())
+    print(f"  Total Labeled Records : {total:,}")
+    print(f"  Fake News (label=1)   : {fake_cnt:,}")
+    print(f"  True News (label=0)   : {true_cnt:,}")
+    print(f"  Train / Test Split    : 80% / 20%")
+    if feat_dim is not None:
+        print(f"  TF-IDF Feature Dim    : {feat_dim:,}")
+    return total, fake_cnt, true_cnt
+
+
