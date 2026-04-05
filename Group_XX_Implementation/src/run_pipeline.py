@@ -239,3 +239,69 @@ def show_preprocessed(df, text_col):
         print(display_df.to_string(index=False))
 
 
+# ─── 5. Feature Engineering ───────────────────────────────────────────────────
+
+def feature_engineering_spark(df):
+    """Returns dict: {'tfidf': (df, col, build_time), 'hash': (df, col, build_time)}"""
+    from pyspark.ml.feature import HashingTF, IDF, CountVectorizer
+
+    # ── TF-IDF via CountVectorizer + IDF ──────────────────────────────────────
+    t0       = time.time()
+    cv       = CountVectorizer(inputCol="filtered_tokens", outputCol="tf_raw",
+                               vocabSize=50_000, minDF=2.0)
+    cv_model = cv.fit(df)
+    df_tf    = cv_model.transform(df)
+    idf       = IDF(inputCol="tf_raw", outputCol="tfidf_features")
+    idf_model = idf.fit(df_tf)
+    df_tfidf  = idf_model.transform(df_tf)
+    tfidf_time = time.time() - t0
+
+    # ── HashingTF + IDF (FIXED: IDF now applied after HashingTF) ──────────────
+    t0          = time.time()
+    htf         = HashingTF(inputCol="filtered_tokens", outputCol="hash_raw",
+                            numFeatures=50_000)
+    df_htf      = htf.transform(df)
+    idf_h       = IDF(inputCol="hash_raw", outputCol="hash_features")
+    idf_h_model = idf_h.fit(df_htf)
+    df_hash     = idf_h_model.transform(df_htf)
+    hash_time   = time.time() - t0
+
+    print(f"[OK]  TF-IDF build: {tfidf_time:.2f}s | "
+          f"HashingTF+IDF build: {hash_time:.2f}s (PySpark)")
+    return {"tfidf": (df_tfidf, "tfidf_features", tfidf_time),
+            "hash":  (df_hash,  "hash_features",  hash_time)}
+
+
+def feature_engineering_pandas(df):
+    """Returns dict: {'tfidf': (X, y, build_time), 'hash': (X, y, build_time)}"""
+    from sklearn.feature_extraction.text import TfidfVectorizer, HashingVectorizer
+
+    corpus = df["filtered_tokens"].apply(lambda toks: " ".join(toks))
+    y      = df["label"].values
+
+    t0        = time.time()
+    tfidf_vec = TfidfVectorizer(max_features=50_000, sublinear_tf=True)
+    X_tfidf   = tfidf_vec.fit_transform(corpus)
+    tfidf_time = time.time() - t0
+    feat_dim  = X_tfidf.shape[1]
+
+    t0       = time.time()
+    hash_vec = HashingVectorizer(n_features=50_000, alternate_sign=False)
+    X_hash   = hash_vec.fit_transform(corpus)
+    hash_time = time.time() - t0
+
+    print(f"[OK]  TF-IDF build: {tfidf_time:.2f}s (dim={feat_dim:,}) | "
+          f"HashingTF build: {hash_time:.2f}s (pandas)")
+    return ({"tfidf": (X_tfidf, y, tfidf_time),
+             "hash":  (X_hash,  y, hash_time)},
+            feat_dim)
+
+
+def feature_engineering(spark, df):
+    if USE_SPARK and spark is not None:
+        return feature_engineering_spark(df), "spark", None
+    else:
+        feats_dict, feat_dim = feature_engineering_pandas(df)
+        return feats_dict, "pandas", feat_dim
+
+
