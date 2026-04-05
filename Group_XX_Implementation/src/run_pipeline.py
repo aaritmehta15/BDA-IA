@@ -140,4 +140,102 @@ def show_dataset_stats(df, feat_dim=None):
         print(f"  TF-IDF Feature Dim    : {feat_dim:,}")
     return total, fake_cnt, true_cnt
 
+# ─── 4. Preprocessing ─────────────────────────────────────────────────────────
+
+# English stopwords — used in pandas path
+_STOPWORDS = {
+    "a","about","above","after","again","against","all","am","an","and",
+    "any","are","aren't","as","at","be","because","been","before","being",
+    "below","between","both","but","by","can't","cannot","could","couldn't",
+    "did","didn't","do","does","doesn't","doing","don't","down","during",
+    "each","few","for","from","further","get","got","had","hadn't","has",
+    "hasn't","have","haven't","having","he","he'd","he'll","he's","her",
+    "here","here's","hers","herself","him","himself","his","how","how's",
+    "i","i'd","i'll","i'm","i've","if","in","into","is","isn't","it",
+    "it's","its","itself","let's","me","more","most","mustn't","my",
+    "myself","no","nor","not","of","off","on","once","only","or","other",
+    "ought","our","ours","ourselves","out","over","own","same","shan't",
+    "she","she'd","she'll","she's","should","shouldn't","so","some","such",
+    "than","that","that's","the","their","theirs","them","themselves","then",
+    "there","there's","these","they","they'd","they'll","they're","they've",
+    "this","those","through","to","too","under","until","up","very","was",
+    "wasn't","we","we'd","we'll","we're","we've","were","weren't","what",
+    "what's","when","when's","where","where's","which","while","who",
+    "who's","whom","why","why's","will","with","won't","would","wouldn't",
+    "you","you'd","you'll","you're","you've","your","yours","yourself",
+    "yourselves","said","also","s","re","ve","ll","t","d",
+}
+
+
+def preprocess_spark(spark, df):
+    """PySpark path: RegexTokenizer → StopWordsRemover."""
+    from pyspark.ml.feature import RegexTokenizer, StopWordsRemover
+    from pyspark.sql.functions import col
+
+    # Ensure text column exists; fall back to 'title' if absent
+    text_col = "text" if "text" in df.columns else df.columns[0]
+
+    # Drop rows with null text
+    df = df.filter(col(text_col).isNotNull())
+
+    tokenizer = RegexTokenizer(
+        inputCol=text_col,
+        outputCol="tokens",
+        pattern=r"[^a-zA-Z]+",   # split on anything that is not a letter
+        toLowercase=True,
+        minTokenLength=2,
+    )
+    df = tokenizer.transform(df)
+
+    remover = StopWordsRemover(
+        inputCol="tokens",
+        outputCol="filtered_tokens",
+    )
+    df = remover.transform(df)
+
+    return df, text_col
+
+
+def preprocess_pandas(df):
+    """Pandas path: regex split + lowercase → stopword filter."""
+    import re
+
+    text_col = "text" if "text" in df.columns else df.columns[0]
+
+    df = df.dropna(subset=[text_col]).copy()
+    df["tokens"] = (
+        df[text_col]
+        .str.lower()
+        .apply(lambda s: [t for t in re.split(r"[^a-zA-Z]+", s) if len(t) >= 2])
+    )
+    df["filtered_tokens"] = df["tokens"].apply(
+        lambda toks: [t for t in toks if t not in _STOPWORDS]
+    )
+    return df, text_col
+
+
+def preprocess(spark, df):
+    if USE_SPARK and spark is not None:
+        df, text_col = preprocess_spark(spark, df)
+        print("[OK]  Preprocessing done (PySpark)")
+    else:
+        df, text_col = preprocess_pandas(df)
+        print("[OK]  Preprocessing done (pandas)")
+    return df, text_col
+
+
+def show_preprocessed(df, text_col):
+    """Print 5 rows showing original text, tokens, filtered_tokens."""
+    cols = [text_col, "tokens", "filtered_tokens"]
+    print("\n── Preprocessed sample (5 rows) ────────────────")
+    if USE_SPARK:
+        df.select(*cols).show(5, truncate=100)
+    else:
+        display_df = df[cols].head(5).copy()
+        # Truncate long strings for readability
+        display_df[text_col] = display_df[text_col].str[:80]
+        display_df["tokens"]          = display_df["tokens"].apply(lambda x: x[:8])
+        display_df["filtered_tokens"] = display_df["filtered_tokens"].apply(lambda x: x[:8])
+        print(display_df.to_string(index=False))
+
 
