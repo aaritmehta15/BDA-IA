@@ -69,3 +69,39 @@ def init_spark():
         return None
 
 
+# ─── 2. Dataset loading ────────────────────────────────────────────────────────
+def load_data_spark(spark):
+    from pyspark.sql.functions import lit
+
+    fake_df = spark.read.csv(FAKE_CSV, header=True, inferSchema=True).withColumn("label", lit(1))
+    true_df = spark.read.csv(TRUE_CSV, header=True, inferSchema=True).withColumn("label", lit(0))
+    return fake_df.union(true_df)
+
+
+def load_data_pandas():
+    import pandas as pd
+
+    fake_df = pd.read_csv(FAKE_CSV)
+    true_df = pd.read_csv(TRUE_CSV)
+    fake_df["label"] = 1
+    true_df["label"] = 0
+    return pd.concat([fake_df, true_df], ignore_index=True)
+
+
+def load_data(spark=None):
+    for path in (FAKE_CSV, TRUE_CSV):
+        if not os.path.exists(path):
+            sys.exit(f"[ERROR] Dataset not found: {path}\n"
+                     "        Download from https://www.kaggle.com/datasets/clmentbisaillon/fake-and-real-news-dataset "
+                     "and place Fake.csv / True.csv in Group_XX_Implementation/Dataset/")
+
+    if USE_SPARK and spark is not None:
+        df = load_data_spark(spark)
+        print("[OK]  Datasets loaded with PySpark")
+    else:
+        df = load_data_pandas()
+        print("[OK]  Datasets loaded with pandas")
+
+    return df
+
+
