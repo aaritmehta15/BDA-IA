@@ -434,3 +434,39 @@ def train_and_evaluate(spark, features_dict, mode):
     return results
 
 
+# ─── 7. Results table ─────────────────────────────────────────────────────────
+
+def print_results_table(results):
+    header = (f"{'Model':<6} {'Feature':<8} {'Accuracy':>10} {'Precision':>10}"
+              f" {'Recall':>10} {'F1':>10} {'TrainTime(s)':>14}")
+    sep    = "─" * len(header)
+    print(f"\n{sep}")
+    print(header)
+    print(sep)
+    for r in results:
+        print(
+            f"{r['Model']:<6} {r['Feature']:<8}"
+            f" {_fmt(r['Accuracy']):>10}"
+            f" {_fmt(r['Precision']):>10}"
+            f" {_fmt(r['Recall']):>10}"
+            f" {_fmt(r['F1']):>10}"
+            f" {r['TrainTime']:>13.2f}s"
+        )
+    print(sep)
+
+    # Best model
+    best = max(results, key=lambda x: x["F1"])
+    print(f"\n★  Best model by F1 : {best['Model']} + {best['Feature']}"
+          f"  →  F1={_fmt(best['F1'])}  Acc={_fmt(best['Accuracy'])}"
+          f"  TrainTime={best['TrainTime']:.2f}s")
+
+    # Feature build time summary
+    print("\n── Feature Build Times ───────────────────────────────")
+    seen = set()
+    for r in results:
+        key = r["Feature"]
+        if key not in seen:
+            print(f"  {key:<8}: {r['BuildTime']:.2f}s")
+            seen.add(key)
+
+
