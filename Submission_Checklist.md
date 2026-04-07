@@ -12,8 +12,8 @@
 - [x] Page length is 20–25 pages (STRICT)
 - [x] Abstract (approx. 250 words) included
 - [x] Introduction & domain context included
-- [x] BDA Architecture (Hadoop, Sqoop, Flume) covered
-- [x] Processing Layer (Kafka, Storm, Spark) explained
+- [x] BDA Architecture (Apache Spark, distributed DAG execution) covered
+- [x] Processing Layer (Spark MLlib, PySpark DataFrames) explained
 - [x] Literature Review (30–35 papers) included
 - [x] Gap Analysis clearly written
 - [x] Proposed Methodology (with equations)

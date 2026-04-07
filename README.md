@@ -15,7 +15,7 @@ Our project's architecture is the direct result of a vast, systematic literature
 **Key Findings from our Literature Survey:**
 - **The Memory Bottleneck:** Traditional frameworks (like `scikit-learn`) rely heavily on single-threaded `CountVectorizers` and `TF-IDF` matrices. As the corpus grows, scanning the entire vocabulary to build feature maps causes immediate Out-Of-Memory (OOM) errors. (**See Paper_Summaries.md for full paper breakdowns**).
 - **The Scalability Gap:** While deep learning approaches achieve high accuracy, they scale poorly outside of expensive GPU clusters.
-- **The Solution:** We concluded that applying the **Hadoop MapReduce Paradigm** via **Apache Spark** is the most optimal way to handle text stream scalability. PySpark naturally partitions data (similar to HDFS blocks) and computes features locally on distributed nodes using `HashingTF`—entirely eliminating the vocabulary memory limit.
+- **The Solution:** We concluded that applying **Apache Spark's distributed computing model** is the most optimal way to handle text stream scalability. PySpark automatically partitions data across all available CPU cores and computes features locally using `HashingTF`—entirely eliminating the vocabulary memory limit that causes OOM errors in traditional frameworks.
 
 All 26 analyzed research papers, including their methodologies, working systems, and identified gaps, are meticulously mapped in the provided `Literature_Review_Sheet.xlsx` and linked in `resources.doc`.
 
@@ -30,7 +30,7 @@ Based on our research, we built a fully distributed Machine Learning pipeline.
 ### Core Codebase: `Group_B1_01_Implementation/main.ipynb`
 
 Our implementation is a Jupyter Notebook built to be executed on **Google Colab** (which provides a simulated `local[*]` distributed engine).
-Instead of limiting data, our script simulates Hadoop parallel processing across the following layers:
+Instead of limiting data, our script uses Apache Spark's distributed DAG execution engine to process data in parallel across the following layers:
 
 1. **Distributed Data Ingestion (Layer 1):** Loading full Kaggle datasets into partitioned PySpark DataFrames instead of static Pandas.
 2. **Parallel Preprocessing (Layer 2):** Utilizing Spark's `RegexTokenizer` and `StopWordsRemover` simultaneously across all CPU worker nodes.
@@ -58,7 +58,7 @@ By benchmarking various Big Data algorithms (`Logistic Regression`, `Decision Tr
 
 *All graphical outputs are automatically saved to the local `Output` folder when you run the pipeline.*
 
-All methodology, mathematical frameworks (Hadoop, Sqoop, Spark schemas), architecture diagrams, performance metrics, and social impact statements are comprehensively laid out in our primary submission report: **`Technical_Chapter/Group_BDA_IA.pdf`**.
+All methodology, mathematical frameworks (Spark schemas, distributed ML pipelines), architecture diagrams, performance metrics, and social impact statements are comprehensively laid out in our primary submission report: **`Technical_Chapter/Group_BDA_IA.pdf`**.
 
 <br>
 
