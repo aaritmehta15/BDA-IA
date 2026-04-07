@@ -1,6 +1,6 @@
 # BDA IA2 & Lab CA – Final Submission Checklist
 
-## 👥 Group Details
+##  Group Details
 - **Group Number:** 01
 - **Batch:** B1
 - **Topic Title:** Big Data Analytics: Distributed Fake News Detection
@@ -70,13 +70,13 @@
 
 ---
 
-## 🚨 Important Reminders
-- ❌ **Similarity > 12%** → Marks penalty
-- ❌ **Page limit not followed** → Marks deduction
-- ❌ **Missing files** → Checklist marks lost
-- ❌ **Poor formatting** → Quality marks reduced
+##  Important Reminders
+-  **Similarity > 12%** → Marks penalty
+-  **Page limit not followed** → Marks deduction
+-  **Missing files** → Checklist marks lost
+-  **Poor formatting** → Quality marks reduced
 
-## 🎯 Student Declaration
+##  Student Declaration
 We confirm that:
 - [x] This work is original
 - [x] Proper references are cited

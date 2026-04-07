@@ -8,7 +8,7 @@ This repository contains the complete execution framework, codebase, and researc
 
 ---
 
-## 📚 1. Extensive Literature Review & Research Motive
+##  1. Extensive Literature Review & Research Motive
 
 Our project's architecture is the direct result of a vast, systematic literature survey. We reviewed **26 pivotal research papers** in the domain of fake news detection to identify systemic flaws in current implementations.
 
@@ -23,7 +23,7 @@ All 26 analyzed research papers, including their methodologies, working systems,
 
 ---
 
-## ⚙️ 2. Proposed Architecture & Code Implementation
+##  2. Proposed Architecture & Code Implementation
 
 Based on our research, we built a fully distributed Machine Learning pipeline. 
 
@@ -41,7 +41,7 @@ Instead of limiting data, our script simulates Hadoop parallel processing across
 
 ---
 
-## 📊 3. Empirical Results & Output Visualizations
+##  3. Empirical Results & Output Visualizations
 
 By comparing a restricted traditional `sklearn` baseline against our distributed `PySpark` pipeline on the exact same test-splits, we achieved highly defensible empirical results. The pipeline generates several automated output graphics saved into the **`Group_B1_01_Implementation/Output/`** folder.
 
@@ -64,7 +64,7 @@ All methodology, mathematical frameworks (Hadoop, Sqoop, Spark schemas), archite
 
 ---
 
-## 🚀 How to Run the Infrastructure
+##  How to Run the Infrastructure
 
 ### Prerequisites
 Install the required packages strictly from our root configuration:
