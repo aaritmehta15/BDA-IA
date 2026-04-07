@@ -35,15 +35,15 @@ Instead of limiting data, our script simulates Hadoop parallel processing across
 1. **Distributed Data Ingestion (Layer 1):** Loading full Kaggle datasets into partitioned PySpark DataFrames instead of static Pandas.
 2. **Parallel Preprocessing (Layer 2):** Utilizing Spark's `RegexTokenizer` and `StopWordsRemover` simultaneously across all CPU worker nodes.
 3. **Memory-Efficient Feature Engineering (Layer 3):** Discarding RAM-heavy vectorizers in favor of PySpark's `HashingTF` algorithm (which hashes words mathematically on the fly, rendering the memory requirement to `O(1)`).
-4. **Ensemble Machine Learning (Layers 4 & 5):** Because the Spark cluster is highly scalable, we are afforded the computational budget to train aggressive ensemble models (like a 50-tree **Random Forest Classifier**) that would normally crash a single-threaded server.
+4. **Ensemble Machine Learning (Layers 4 & 5):** Because the Spark cluster is highly scalable, we are afforded the computational budget to train aggressive ensemble models (like a **100-tree Random Forest Classifier**) that would normally crash a single-threaded server.
 
 <br>
 
 ---
 
-##  3. Empirical Results & Output Visualizations
+## 📊 3. Empirical Results & Output Visualizations
 
-By comparing a restricted traditional `sklearn` baseline against our distributed `PySpark` pipeline on the exact same test-splits, we achieved highly defensible empirical results. The pipeline generates several automated output graphics saved into the **`Group_B1_01_Implementation/Output/`** folder.
+By benchmarking various Big Data algorithms (`Logistic Regression`, `Decision Tree`, and `Random Forest`), testing `CountVectorizer` vs memory-friendly `HashingTF`, and running dynamic Scale tests (1x data vs 2x data volumes), our `PySpark` pipeline achieved highly defensible empirical results. The pipeline generates automated output graphics saved into the **`Group_B1_01_Implementation/Output/`** folder.
 
 ### What We Achieved (Code Outputs):
 
