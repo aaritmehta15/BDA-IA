@@ -75,8 +75,8 @@ pip install -r requirements.txt
 
 ### Running via Google Colab (Recommended for Academic Review)
 1. Open [Google Colab](https://colab.research.google.com).
-2. Upload `Group_B1_01_Implementation/main.ipynb`.
-3. Select **Run All**. The notebook will dynamically provision standard resources, connect to KaggleHub to download the dataset silently, and execute the comparative Big Data metrics layer by layer.
+2. Upload `Group_B1_01_Implementation/main.ipynb` along with the `Fake.csv` and `True.csv` datasets.
+3. Select **Run All**. The notebook will dynamically provision standard resources and execute the comparative Big Data metrics layer by layer.
 
 <br>
 
