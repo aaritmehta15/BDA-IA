@@ -1,9 +1,9 @@
 # BDA IA2 & Lab CA – Final Submission Checklist
 
 ## 👥 Group Details
-- **Group Number:** B1_01
-- **Batch:** __________
-- **Topic Title:** __________________________________________
+- **Group Number:** 01
+- **Batch:** B1
+- **Topic Title:** Big Data Analytics: Distributed Fake News Detection
 
 ---
 
