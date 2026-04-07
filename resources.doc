@@ -1,30 +1,30 @@
-1. Shu, K., Sliva, A., Wang, S., Tang, J., & Liu, H. Fake News Detection on Social Media: A Data Mining Perspective.
-2. Altheneyan, A., & Alhadlaq, A. Big Data ML-Based Fake News Detection using Distributed Learning.
-3. Barwaniwala, Z., Chandna, P., Goud, A., & Ramesh, S. A Review of Hadoop-Based Frameworks for Fake Review Detection.
-4. Murayama, T. Dataset of Fake News Detection and Fact Verification: A Survey.
-5. Kuntur, S., Wróblewska, A., Paprzycki, M., & Ganzha, M. Fake News Detection: It's All in the Data!
-6. Surjeet et al. Scalable Fake News Detection: NLP and Embedding Models for Large-Scale Data.
-7. Zhang, J., Dong, B., & Yu, P. S. FAKEDETECTOR: Effective Fake News Detection with Deep Diffusive Neural Network.
-8. Alnabhan, M. Q., & Branco, P. Fake News Detection Using Deep Learning: A Systematic Literature Review.
-9. Pérez-Rosas, V., Kleinberg, B., Lefevre, A., & Mihalcea, R. Automatic Detection of Fake News.
-10. Shahzad, K., Khan, S. A., Ahmad, S., & Iqbal, A. A Scoping Review of Big Data Analytics with Context-Based Fake News Detection.
-11. Asr, F. T., & Taboada, M. Big Data and Quality Data for Fake News and Misinformation Detection.
-12. Awan, M. J. et al. Fake News Data Exploration and Analytics.
-13. Cano-Marin, E. et al. The Power of Big Data Analytics over Fake News.
-14. Raza, S., Paulen-Patterson, D., & Ding, C. Comparative Evaluation of BERT-like Models and LLMs.
-15. Zhou, X. et al. Fake News Early Detection.
-16. Wang, W. Y. LIAR Benchmark Dataset.
-17. Chauhan, T., & Palivela, H. Optimization and Improvement using Deep Learning.
-18. Molina, S., & Hong, S. Analytics and Visualization of Detecting Fake News Accuracy.
-19. Ge, S. et al. Scalable Framework for Multilevel Streaming Data Analytics.
-20. Ching, C.-W., & Hu, L. Decaffe: DHT Tree-Based Online Federated Fake News Detection.
-21. Agarwala, V. et al. Analysis of Classifiers for Fake News Detection.
-22. D'Ulizia, A., Caschera, M. C., Ferri, F., & Grifoni, P. Fake News Detection: A Survey of Evaluation Datasets.
-23. Jang, S. H., Jung, K. E., & Yi, Y. J. The Power of Fake News: Big Data Analysis of COVID-19.
-24. Kareem, A. R., & Abdullah, H. S. Leveraging Hadoop and Hybrid Deep Learning on Home Datasets.
-25. Saif, M. et al. Identification of Fake News Using ML in Distributed System.
-26. Tajrian, M. et al. A Review of Methodologies for Fake News Analysis.
+# Project References
 
----
-Overleaf Edit Link: [Insert Link Here]
-Overleaf Member Access: pankaj.mishra@somaiya.edu
+| # | Title | Year | DOI / URL |
+|---|---|---|---|
+| 1 | **Fake News Detection on Social Media: A Data Mining Perspective**<br>_Shu, K., Sliva, A., Wang, S., Tang, J., & Liu, H_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=Fake+News+Detection+on+Social+Media:+A+Data+Mining+Perspective) |
+| 2 | **Big Data ML-Based Fake News Detection using Distributed Learning**<br>_Altheneyan, A., & Alhadlaq, A_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=Big+Data+ML-Based+Fake+News+Detection+using+Distributed+Learning) |
+| 3 | **A Review of Hadoop-Based Frameworks for Fake Review Detection**<br>_Barwaniwala, Z., Chandna, P., Goud, A., & Ramesh, S_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=A+Review+of+Hadoop-Based+Frameworks+for+Fake+Review+Detection) |
+| 4 | **Dataset of Fake News Detection and Fact Verification: A Survey**<br>_Murayama, T_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=Dataset+of+Fake+News+Detection+and+Fact+Verification:+A+Survey) |
+| 5 | **Fake News Detection: It's All in the Data!**<br>_Kuntur, S., Wróblewska, A., Paprzycki, M., & Ganzha, M_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=Fake+News+Detection:+It's+All+in+the+Data!) |
+| 6 | **Scalable Fake News Detection: NLP and Embedding Models for Large-Scale Data**<br>_Surjeet et al_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=Scalable+Fake+News+Detection:+NLP+and+Embedding+Models+for+Large-Scale+Data) |
+| 7 | **S. FAKEDETECTOR: Effective Fake News Detection with Deep Diffusive Neural Network**<br>_Zhang, J., Dong, B., & Yu, P_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=S.+FAKEDETECTOR:+Effective+Fake+News+Detection+with+Deep+Diffusive+Neural+Network) |
+| 8 | **Q., & Branco, P. Fake News Detection Using Deep Learning: A Systematic Literature Review**<br>_Alnabhan, M_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=Q.,+&+Branco,+P.+Fake+News+Detection+Using+Deep+Learning:+A+Systematic+Literature+Review) |
+| 9 | **Automatic Detection of Fake News**<br>_Pérez-Rosas, V., Kleinberg, B., Lefevre, A., & Mihalcea, R_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=Automatic+Detection+of+Fake+News) |
+| 10 | **A., Ahmad, S., & Iqbal, A. A Scoping Review of Big Data Analytics with Context-Based Fake News Detection**<br>_Shahzad, K., Khan, S_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=A.,+Ahmad,+S.,+&+Iqbal,+A.+A+Scoping+Review+of+Big+Data+Analytics+with+Context-Based+Fake+News+Detection) |
+| 11 | **T., & Taboada, M. Big Data and Quality Data for Fake News and Misinformation Detection**<br>_Asr, F_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=T.,+&+Taboada,+M.+Big+Data+and+Quality+Data+for+Fake+News+and+Misinformation+Detection) |
+| 12 | **J. et al. Fake News Data Exploration and Analytics**<br>_Awan, M_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=J.+et+al.+Fake+News+Data+Exploration+and+Analytics) |
+| 13 | **et al. The Power of Big Data Analytics over Fake News**<br>_Cano-Marin, E_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=et+al.+The+Power+of+Big+Data+Analytics+over+Fake+News) |
+| 14 | **Comparative Evaluation of BERT-like Models and LLMs**<br>_Raza, S., Paulen-Patterson, D., & Ding, C_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=Comparative+Evaluation+of+BERT-like+Models+and+LLMs) |
+| 15 | **et al. Fake News Early Detection**<br>_Zhou, X_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=et+al.+Fake+News+Early+Detection) |
+| 16 | **Y. LIAR Benchmark Dataset**<br>_Wang, W_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=Y.+LIAR+Benchmark+Dataset) |
+| 17 | **Optimization and Improvement using Deep Learning**<br>_Chauhan, T., & Palivela, H_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=Optimization+and+Improvement+using+Deep+Learning) |
+| 18 | **Analytics and Visualization of Detecting Fake News Accuracy**<br>_Molina, S., & Hong, S_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=Analytics+and+Visualization+of+Detecting+Fake+News+Accuracy) |
+| 19 | **et al. Scalable Framework for Multilevel Streaming Data Analytics**<br>_Ge, S_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=et+al.+Scalable+Framework+for+Multilevel+Streaming+Data+Analytics) |
+| 20 | **Decaffe: DHT Tree-Based Online Federated Fake News Detection**<br>_Ching, C.-W., & Hu, L_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=Decaffe:+DHT+Tree-Based+Online+Federated+Fake+News+Detection) |
+| 21 | **et al. Analysis of Classifiers for Fake News Detection**<br>_Agarwala, V_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=et+al.+Analysis+of+Classifiers+for+Fake+News+Detection) |
+| 22 | **C., Ferri, F., & Grifoni, P. Fake News Detection: A Survey of Evaluation Datasets**<br>_D'Ulizia, A., Caschera, M_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=C.,+Ferri,+F.,+&+Grifoni,+P.+Fake+News+Detection:+A+Survey+of+Evaluation+Datasets) |
+| 23 | **H., Jung, K. E., & Yi, Y. J. The Power of Fake News: Big Data Analysis of COVID-19**<br>_Jang, S_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=H.,+Jung,+K.+E.,+&+Yi,+Y.+J.+The+Power+of+Fake+News:+Big+Data+Analysis+of+COVID-19) |
+| 24 | **R., & Abdullah, H. S. Leveraging Hadoop and Hybrid Deep Learning on Home Datasets**<br>_Kareem, A_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=R.,+&+Abdullah,+H.+S.+Leveraging+Hadoop+and+Hybrid+Deep+Learning+on+Home+Datasets) |
+| 25 | **et al. Identification of Fake News Using ML in Distributed System**<br>_Saif, M_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=et+al.+Identification+of+Fake+News+Using+ML+in+Distributed+System) |
+| 26 | **et al. A Review of Methodologies for Fake News Analysis**<br>_Tajrian, M_ | 20XX | [Google Scholar](https://scholar.google.com/scholar?q=et+al.+A+Review+of+Methodologies+for+Fake+News+Analysis) |

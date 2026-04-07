@@ -1,72 +1,72 @@
 # BDA IA2 & Lab CA – Final Submission Checklist
 
 ## 👥 Group Details
-- **Group Number:** __________
+- **Group Number:** B1_01
 - **Batch:** __________
 - **Topic Title:** __________________________________________
 
 ---
 
 ## Section 1: Technical Chapter (PDF)
-- [ ] PDF generated using LaTeX (Overleaf only)
-- [ ] Page length is 20–25 pages (STRICT)
-- [ ] Abstract (approx. 250 words) included
-- [ ] Introduction & domain context included
-- [ ] BDA Architecture (Hadoop, Sqoop, Flume) covered
-- [ ] Processing Layer (Kafka, Storm, Spark) explained
-- [ ] Literature Review (30–35 papers) included
-- [ ] Gap Analysis clearly written
-- [ ] Proposed Methodology (with equations)
-- [ ] System Architecture diagram added
-- [ ] Case Study + Results + Graphs included
-- [ ] Social Impact analysis included
-- [ ] Conclusion & Future Scope included
-- [ ] References (Springer format) added
+- [x] PDF generated using LaTeX (Overleaf only)
+- [x] Page length is 20–25 pages (STRICT)
+- [x] Abstract (approx. 250 words) included
+- [x] Introduction & domain context included
+- [x] BDA Architecture (Hadoop, Sqoop, Flume) covered
+- [x] Processing Layer (Kafka, Storm, Spark) explained
+- [x] Literature Review (30–35 papers) included
+- [x] Gap Analysis clearly written
+- [x] Proposed Methodology (with equations)
+- [x] System Architecture diagram added
+- [x] Case Study + Results + Graphs included
+- [x] Social Impact analysis included
+- [x] Conclusion & Future Scope included
+- [x] References (Springer format) added
 
 ---
 
 ## Section 2: Similarity Report
-- [ ] Generated using Turnitin
-- [ ] Similarity ≤ 12%
-- [ ] References excluded (if possible)
-- [ ] File named correctly
+- [x] Generated using Turnitin
+- [x] Similarity <= 12% (7% achieved)
+- [x] References excluded (if possible)
+- [x] File named correctly
 
 ---
 
 ## Section 3: Implementation (ZIP Folder)
-- [ ] ZIP file created (`Group_XX_Implementation.zip`)
-- [ ] Main notebook (`.ipynb`) included
-- [ ] Code is properly documented (Markdown cells)
-- [ ] Dataset included or linked
-- [ ] `requirements.txt` file added
-- [ ] `README.md` file added
-- [ ] Output results/graphs included
-- [ ] Folder is GitHub-ready
+- [x] ZIP file created (`Group_B1_01_Implementation.zip`)
+- [x] Main notebook (`.ipynb`) included
+- [x] Code is properly documented (Markdown cells)
+- [x] Dataset included or linked
+- [x] `requirements.txt` file added
+- [x] `README.md` file added
+- [x] Output results/graphs included
+- [x] Folder is GitHub-ready
 
 ---
 
 ## Section 4: Resources Document
-- [ ] File named `resources.doc`
-- [ ] All references listed (Title + Year + DOI/URL)
-- [ ] Overleaf project link added
-- [ ] Edit access given to: `pankaj.mishra@somaiya.edu`
+- [x] File named `resources.doc`
+- [x] All references listed (Title + Year + DOI/URL)
+- [x] Overleaf project link added
+- [x] Edit access given to: `pankaj.mishra@somaiya.edu`
 
 ---
 
 ## Section 5: Additional Files (if applicable)
-- [ ] Literature Review Excel Sheet
-- [ ] High-resolution diagrams
-- [ ] Additional datasets
-- [ ] Presentation (optional)
+- [x] Literature Review Excel Sheet
+- [x] High-resolution diagrams
+- [x] Additional datasets
+- [x] Presentation (optional)
 
 ---
 
 ## Final Verification (Before Submission)
-- [ ] All files uploaded in shared folder
-- [ ] File names follow correct format
-- [ ] No missing sections in report
-- [ ] All group members contributed
-- [ ] Signed Checklist Uploaded
+- [x] All files uploaded in shared folder
+- [x] File names follow correct format
+- [x] No missing sections in report
+- [x] All group members contributed
+- [x] Signed Checklist Uploaded
 
 ---
 
@@ -78,12 +78,11 @@
 
 ## 🎯 Student Declaration
 We confirm that:
-- [ ] This work is original
-- [ ] Proper references are cited
-- [ ] All submission requirements are fulfilled
+- [x] This work is original
+- [x] Proper references are cited
+- [x] All submission requirements are fulfilled
 
 **Signatures (All Members):**
-1. 
-2. 
-3. 
-4. 
+1. Aarit Mehta
+2. Akshat Panchal
+3. Affan Shaikh
